@@ -5,3 +5,9 @@ Helper tool to make requests to a machine learning model in order to determine s
 ## Install Instructions (to-be-added)
 
 ## How to Use (to-be-added)
+
+## To-Do
+- [ ] Analyze existing training/target data to create sentiment analysis model
+- [ ] Utilize model to make API requests to Youtube per video basis
+- [ ] Create Python package
+- [ ] Create web based portal
