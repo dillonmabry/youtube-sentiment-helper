@@ -7,8 +7,8 @@ Helper tool to make requests to a machine learning model in order to determine s
 ## How to Use (to-be-added)
 
 ## To-Do
+- [ ] Create API to use Youtube API V3 via REST to get comments for videos
 - [ ] Analyze existing sentiment analysis models to select and use
-- [ ] Create API to use Youtube API V3 via REST
 - [ ] Utilize sentiment analysis to analyze Youtube video and provide analytics
 - [ ] Finalize and create Python package for project 
 - [ ] Create web based portal
