@@ -7,7 +7,6 @@ def get_key(json, key):
     """
     return list(findkeys(json, key))
 
-
 def findkeys(node, kv):
     """
     Method to get json from nested json starting from root
