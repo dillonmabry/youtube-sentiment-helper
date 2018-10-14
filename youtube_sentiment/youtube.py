@@ -17,7 +17,7 @@ class Youtube(object):
         self.maxpages = maxpages
         self.session = requests.Session()
         self.session.headers.update({'Content-Type': 'application/json'})
-        self.logger = Logger(self.__class__.__name__).get()
+        self.logger = Logger(self.__class__.__name__, maxbytes=10*1024*1024).get()
 
     def get_comments(self, videoId):
         """
