@@ -1,4 +1,9 @@
-def get_key(json, key):
+"""
+Module of utility functions to handle data manipulation
+"""
+import itertools
+
+def get_key_values(json, key):
     """
     Method to parse json of keys extracted, returns list of values
     Args:
@@ -24,3 +29,12 @@ def findkeys(node, kv):
         for j in node.values():
             for x in findkeys(j, kv):
                 yield x
+
+def flatten_list(items):
+    """
+    Method to flatten list of lists using itertools (faster than traditional lists)
+    Args:
+        items: the list of lists [ [item1],[item2] ]
+    """
+    if len(items) > 0 and items is not None:
+        return list(itertools.chain.from_iterable(items))

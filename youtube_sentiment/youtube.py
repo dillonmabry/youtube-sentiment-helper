@@ -1,5 +1,6 @@
 import requests
 from requests.exceptions import RequestException
+from utility import flatten_list
 from logger import Logger
 
 class Youtube(object):
@@ -26,7 +27,6 @@ class Youtube(object):
             videoId: Youtube video unique id from url
         """
         try:
-            all_comments = []
             payload = {
                 'key': self.api_key, 
                 'textFormat': 'plaintext', 
@@ -36,6 +36,7 @@ class Youtube(object):
             }
             r = self.session.request(method='get', url=self.endpoint, params=payload)
             if (r.status_code == requests.codes.ok):
+                all_comments = []
                 self.logger.info("API request endpoint: {0} | Video requested: {1}".format(
                     self.endpoint, videoId))
                 all_comments.append(self.get_comment_values(r.json()))
@@ -44,11 +45,9 @@ class Youtube(object):
                     payload["pageToken"] = nextPageToken
                     r_next = self.session.request(method='get', url=self.endpoint, params=payload)
                     if(r_next.status_code == requests.codes.ok):
-                        self.logger.info("API request endpoint: {0} | Video requested: {1}".format(
-                            self.endpoint, videoId))
                         nextPageToken = r_next.json().get("nextPageToken")
                         all_comments.append(self.get_comment_values(r_next.json()))
-            return [comment for thread in all_comments for comment in thread]
+                return flatten_list(all_comments)
         except RequestException as e:
             self.logger.exception(str(e))
             raise
@@ -68,7 +67,6 @@ class Youtube(object):
                 all_comments.append(text)
                 if 'replies' in item.keys():
                     for reply in item['replies']['comments']:
-                        rauthor = reply['snippet']['authorDisplayName']
                         rtext = reply["snippet"]["textDisplay"]
                         all_comments.append(rtext)
             return all_comments
