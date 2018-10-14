@@ -1,13 +1,17 @@
 import argparse
 from youtube import Youtube
-import time
+from utility import load_ml_pipeline
+from utility import total_sentiment
 
 def process_video_comments(apiKey, videoId, maxpages):
+    # Load video comments
     yt = Youtube('https://www.googleapis.com/youtube/v3/commentThreads', apiKey, maxpages)
-    start_time = time.time()
     comments = yt.get_comments(videoId)
-    print(len(comments))
-    print("--- %s seconds ---" % (time.time() - start_time))
+    # Classify sentiment
+    model = load_ml_pipeline("./models/lr_sentiment_basic.pkl")
+    predictions = model.predict(comments)
+    ts = total_sentiment(predictions)
+    print("Total sentiment scores (Pos, Neg): {0}".format(ts))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

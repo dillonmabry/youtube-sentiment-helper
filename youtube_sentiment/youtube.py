@@ -1,6 +1,7 @@
 import requests
 from requests.exceptions import RequestException
 from logger import Logger
+from utility import flatten_list
 
 class Youtube(object):
     """
@@ -21,7 +22,7 @@ class Youtube(object):
 
     def get_comments(self, videoId):
         """
-        Method to return video comments max results
+        Method to return list of video comments
         Args:
             self
             videoId: Youtube video unique id from url
@@ -49,7 +50,7 @@ class Youtube(object):
                         nextPageToken = r_next.json().get("nextPageToken")
                         all_comments.append(self.get_comment_values(r_next.json()))
                         idx = idx + 1
-                return [item for items in all_comments for item in items]
+                return flatten_list(all_comments)
             elif (r.status_code == requests.codes.forbidden):
                 self.logger.error("Status: {0} | API Key is incorrect or restricted.".format(r.status_code))
             else: 
