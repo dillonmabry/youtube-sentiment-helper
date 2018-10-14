@@ -1,6 +1,5 @@
 import requests
 from requests.exceptions import RequestException
-from utility import flatten_list
 from logger import Logger
 
 class Youtube(object):
@@ -12,9 +11,10 @@ class Youtube(object):
         endpoint: Google API endpoint
         api_key: Google API key for Youtube
     """
-    def __init__(self, endpoint, api_key):
+    def __init__(self, endpoint, api_key, maxpages):
         self.endpoint = endpoint
         self.api_key = api_key
+        self.maxpages = maxpages
         self.session = requests.Session()
         self.session.headers.update({'Content-Type': 'application/json'})
         self.logger = Logger(self.__class__.__name__).get()
@@ -41,13 +41,19 @@ class Youtube(object):
                     self.endpoint, videoId))
                 all_comments.append(self.get_comment_values(r.json()))
                 nextPageToken = r.json().get('nextPageToken')
-                while(nextPageToken):
+                idx = 0
+                while(nextPageToken and idx < self.maxpages):
                     payload["pageToken"] = nextPageToken
                     r_next = self.session.request(method='get', url=self.endpoint, params=payload)
                     if(r_next.status_code == requests.codes.ok):
                         nextPageToken = r_next.json().get("nextPageToken")
                         all_comments.append(self.get_comment_values(r_next.json()))
-                return flatten_list(all_comments)
+                        idx = idx + 1
+                return [item for items in all_comments for item in items]
+            elif (r.status_code == requests.codes.forbidden):
+                self.logger.error("Status: {0} | API Key is incorrect or restricted.".format(r.status_code))
+            else: 
+                self.logger.error("Status: {0} | An error has occurred".format(r.status_code))
         except RequestException as e:
             self.logger.exception(str(e))
             raise

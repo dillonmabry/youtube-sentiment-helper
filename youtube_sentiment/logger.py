@@ -1,6 +1,5 @@
 import os
 import logging 
-import config
 
 class Logger(object):
     """
@@ -15,9 +14,9 @@ class Logger(object):
         logger = logging.getLogger('log_namespace.%s' % name)
         logger.setLevel(logging.DEBUG)
         if not logger.handlers:
-            if not os.path.isdir(config.LOGGING_DIR):
-                os.mkdir(config.LOGGING_DIR)
-            file_name = os.path.join(config.LOGGING_DIR, '%s.log' % name)   
+            if not os.path.isdir('log'):
+                os.mkdir('log')
+            file_name = os.path.join('log', '%s.log' % name)   
             handler = logging.FileHandler(file_name)
             formatter = logging.Formatter('%(asctime)s %(levelname)s:%(name)s %(message)s')
             handler.setFormatter(formatter)

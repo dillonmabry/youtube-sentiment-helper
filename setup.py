@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(name='youtube_sentiment',
       version='0.1',
@@ -7,5 +7,10 @@ setup(name='youtube_sentiment',
       author='Dillon Mabry',
       author_email='rapid.dev.solutions@gmail.com',
       license='MIT',
-      packages=['youtube_sentiment'],
+      packages=find_packages('youtube_sentiment'),
+      entry_points={
+      'console_scripts': [
+            'youtube_sentiment=youtube_sentiment.main:main',
+      ],
+      },
       zip_safe=False)
