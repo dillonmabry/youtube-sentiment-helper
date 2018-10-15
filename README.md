@@ -16,7 +16,8 @@ yt.process_video_comments(<Youtube API Key>, <Youtube video ID>, <Max Pages of C
 ```
 ## To-Do
 - [X] Create API to use Youtube API V3 via REST to get comments for videos
-- [ ] Analyze existing sentiment analysis models to select and use
+- [X] Analyze existing sentiment analysis models to select and use
+- [ ] Improve/enhance sentiment learning model
 - [ ] Utilize sentiment analysis to analyze Youtube video and provide analytics
 - [ ] Finalize and create Python package for project 
 - [ ] Create web based portal
