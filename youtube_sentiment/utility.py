@@ -3,34 +3,10 @@ Module of utility functions to handle data manipulation
 """
 import itertools
 import numpy as np
+from nltk.tokenize import RegexpTokenizer
+from nltk.corpus import stopwords
+from nltk import FreqDist
 from sklearn.externals import joblib
-
-def get_key_values(json, key):
-    """
-    Method to parse json of keys extracted, returns list of values
-    Args:
-        json: the full json object
-        key: the key to search by, returns values for this key
-    """
-    return list(findkeys(json, key))
-
-def findkeys(node, kv):
-    """
-    Method to get json from nested json starting from root
-    Args:
-        node: the json root to start at
-        kv: the key to search
-    """
-    if isinstance(node, list):
-        for i in node:
-            for x in findkeys(i, kv):
-                yield x
-    elif isinstance(node, dict):
-        if kv in node:
-            yield node[kv]
-        for j in node.values():
-            for x in findkeys(j, kv):
-                yield x
 
 def flatten_list(items):
     """
@@ -40,6 +16,18 @@ def flatten_list(items):
     """
     if len(items) > 0 and items is not None:
         return list(itertools.chain.from_iterable(items))
+
+def top_freq_words(comments):
+    """
+    Method to return frequency distribution of words from corpus text
+    Args:
+        comments: the corpus of comments as a single string
+    """
+    tokenizer = RegexpTokenizer(r'\w+')
+    words = tokenizer.tokenize(comments)
+    swords = stopwords.words('english')
+    freq_words = FreqDist(w.lower() for w in words if w not in swords)   
+    return freq_words
 
 def load_ml_pipeline(file_path):
     """
