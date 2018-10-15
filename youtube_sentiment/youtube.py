@@ -1,7 +1,7 @@
 import requests
 from requests.exceptions import RequestException
-from logger import Logger
-from utility import flatten_list
+from youtube_sentiment import Logger
+from youtube_sentiment import flatten_list
 
 class Youtube(object):
     """

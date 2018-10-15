@@ -1,8 +1,8 @@
 import argparse
-from youtube import Youtube
-from utility import load_ml_pipeline
-from utility import total_sentiment
-from utility import top_freq_words
+from youtube_sentiment import Youtube
+from youtube_sentiment import load_ml_pipeline
+from youtube_sentiment import total_sentiment
+from youtube_sentiment import top_freq_words
 
 def process_video_comments(apiKey, videoId, maxpages):
     # Load video comments
@@ -17,10 +17,13 @@ def process_video_comments(apiKey, videoId, maxpages):
     ts = total_sentiment(predictions)
     print("Total sentiment scores (Pos, Neg): {0}".format(ts))
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("apiKey", help="Enter the Youtube API key to use for requests")
     parser.add_argument("videoId", help="Enter the Youtube video ID")
     parser.add_argument("maxpages", help="Enter the max pages returned of comments", type=int)
     args = parser.parse_args()
     process_video_comments(args.apiKey, args.videoId, args.maxpages)
+
+if __name__ == '__main__':
+    main()
