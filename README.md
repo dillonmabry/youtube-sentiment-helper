@@ -6,7 +6,9 @@ Helper tool to make requests to a machine learning model in order to determine s
 `pip install .`
 ## How to Use
 Current usage:
-`python main.py <Youtube API Key> <Youtube video ID> <Max Pages of Comments>`
+```
+python main.py <Youtube API Key> <Youtube video ID> <Max Pages of Comments>
+```
 or
 ```
 import youtube_sentiment as yt
