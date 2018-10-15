@@ -2,12 +2,16 @@
 Determine sentiment of Youtube video per comment based analysis using Sci-kit by analyzing video comments based on positive/negative sentiment. 
 Helper tool to make requests to a machine learning model in order to determine sentiment using the Youtube API.
 
-## Install Instructions (to-be-updated)
-
-## How to Use (to-be-updated)
+## Install Instructions
+`pip install .`
+## How to Use
 Current usage:
 `python main.py <Youtube API Key> <Youtube video ID> <Max Pages of Comments>`
-
+or
+```
+import youtube_sentiment as yt
+yt.process_video_comments(<Youtube API Key>, <Youtube video ID>, <Max Pages of Comments>) 
+```
 ## To-Do
 - [X] Create API to use Youtube API V3 via REST to get comments for videos
 - [ ] Analyze existing sentiment analysis models to select and use
