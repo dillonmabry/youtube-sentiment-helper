@@ -14,6 +14,10 @@ or
 import youtube_sentiment as yt
 yt.process_video_comments(<Youtube API Key>, <Youtube video ID>, <Max Pages of Comments>) 
 ```
+## Tests
+```
+python setup.py test
+```
 ## To-Do
 - [X] Create API to use Youtube API V3 via REST to get comments for videos
 - [X] Analyze existing sentiment analysis models to select and use
