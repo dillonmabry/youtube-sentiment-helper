@@ -5,6 +5,13 @@ from youtube_sentiment import total_sentiment
 from youtube_sentiment import top_freq_words
 
 def process_video_comments(apiKey, videoId, maxpages):
+    """
+    Display video sentiment and analytics
+    Args:
+        apiKey: Youtube API key
+        videoId: video ID
+        maxpages: max pages of comments to scan
+    """
     # Load video comments
     yt = Youtube('https://www.googleapis.com/youtube/v3/commentThreads', apiKey, maxpages)
     comments = yt.get_comments(videoId)
@@ -12,7 +19,7 @@ def process_video_comments(apiKey, videoId, maxpages):
     top_words = top_freq_words(' '.join(comments))
     print("Frequency distribution: {0}".format(top_words.most_common(20)))
     # Classify sentiment
-    model = load_ml_pipeline("youtube_sentiment/models/lr_sentiment_basic.pkl")
+    model = load_ml_pipeline("./models/lr_sentiment_basic.pkl")
     predictions = model.predict(comments)
     ts = total_sentiment(predictions)
     print("Total sentiment scores (Pos, Neg): {0}".format(ts))
