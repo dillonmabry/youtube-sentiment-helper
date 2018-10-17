@@ -12,7 +12,7 @@ def process_video_comments(apiKey, videoId, maxpages):
     top_words = top_freq_words(' '.join(comments))
     print("Frequency distribution: {0}".format(top_words.most_common(20)))
     # Classify sentiment
-    model = load_ml_pipeline("./models/lr_sentiment_basic.pkl")
+    model = load_ml_pipeline("youtube_sentiment/models/lr_sentiment_basic.pkl")
     predictions = model.predict(comments)
     ts = total_sentiment(predictions)
     print("Total sentiment scores (Pos, Neg): {0}".format(ts))
