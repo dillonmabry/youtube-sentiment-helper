@@ -7,6 +7,7 @@ from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import stopwords
 from nltk import FreqDist
 from sklearn.externals import joblib
+import pkg_resources
 
 def flatten_list(items):
     """
@@ -29,13 +30,14 @@ def top_freq_words(comments):
     freq_words = FreqDist(w.lower() for w in words if w not in swords)   
     return freq_words
 
-def load_ml_pipeline(file_path):
+def load_ml_pipeline(filename):
     """
     Method to load ML pipeline model via sklearn joblib (pickle)
     Args:
         file_path: the file path of the .pkl model
     """
-    with (open(file_path, "rb")) as f:
+    model_path = pkg_resources.resource_filename('youtube_sentiment', 'models/')
+    with (open(model_path + filename, "rb")) as f:
         try:
             return joblib.load(f)
         except Exception as e:
