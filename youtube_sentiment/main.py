@@ -1,5 +1,4 @@
 import argparse
-import pkg_resources
 from youtube_sentiment import Youtube
 from youtube_sentiment import load_ml_pipeline
 from youtube_sentiment import total_sentiment
