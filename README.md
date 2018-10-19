@@ -7,13 +7,14 @@ Helper tool to make requests to a machine learning model in order to determine s
 ## How to Use
 Current usage:
 ```
-python main.py <Youtube API Key> <Youtube video ID> <Max Pages of Comments>
+python main.py <Youtube API Key> <Youtube Video ID> <Max Pages of Comments> <Sentiment Model>
 ```
 or
 ```
 import youtube_sentiment as yt
-yt.process_video_comments(<Youtube API Key>, <Youtube video ID>, <Max Pages of Comments>) 
+yt.process_comments_summary(<Youtube API Key>, <Youtube Video ID>, <Max Pages of Comments>, <Sentiment Model>) 
 ```
+Choices for model selection are found under the included models for setup also under project path `./models`
 ## Tests
 ```
 python setup.py test
