@@ -32,8 +32,9 @@ def main():
     parser.add_argument("apiKey", help="Enter the Youtube API key to use for requests")
     parser.add_argument("videoId", help="Enter the Youtube video ID")
     parser.add_argument("maxpages", help="Enter the max pages returned of comments", type=int)
+    parser.add_argument("model", help="Enter the model name to use for sentiment")
     args = parser.parse_args()
-    process_comments_summary(args.apiKey, args.videoId, args.maxpages)
+    process_comments_summary(args.apiKey, args.videoId, args.maxpages, args.model)
 
 if __name__ == '__main__':
     main()
