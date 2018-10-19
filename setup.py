@@ -10,4 +10,9 @@ setup(name='youtube_sentiment',
       packages=['youtube_sentiment'],
       test_suite='nose.collector',
       tests_require=['nose'],
+      include_package_data=True,
+      data_files=[('', [
+            'youtube_sentiment/models/lr_sentiment_basic.pkl', 
+            'youtube_sentiment/models/lr_sentiment_cv.pkl'])
+      ],
       zip_safe=False)

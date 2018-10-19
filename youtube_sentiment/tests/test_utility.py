@@ -1,4 +1,5 @@
 from unittest import TestCase
+import pkg_resources
 from youtube_sentiment import flatten_list
 from youtube_sentiment import load_ml_pipeline
 
@@ -7,7 +8,8 @@ class TestUtil(TestCase):
     @classmethod
     def setUpClass(self):
         """ Setup """
-        self.mock = load_ml_pipeline("youtube_sentiment/models/lr_sentiment_basic.pkl")
+        model_path = pkg_resources.resource_filename('youtube_sentiment', 'models/')
+        self.mock = load_ml_pipeline("{0}lr_sentiment_basic.pkl".format(model_path))
 
     """ Utility class tests """
     def test_flatten_list(self):

@@ -1,0 +1,4 @@
+include README.md
+include LICENSE
+include youtube_sentiment/models/lr_sentiment_basic.pkl
+include youtube_sentiment/models/lr_sentiment_cv.pkl

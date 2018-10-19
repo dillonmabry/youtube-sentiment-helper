@@ -1,16 +1,18 @@
 import argparse
+import pkg_resources
 from youtube_sentiment import Youtube
 from youtube_sentiment import load_ml_pipeline
 from youtube_sentiment import total_sentiment
 from youtube_sentiment import top_freq_words
 
-def process_video_comments(apiKey, videoId, maxpages):
+def process_comments_summary(apiKey, videoId, maxpages, model):
     """
     Display video sentiment and analytics
     Args:
         apiKey: Youtube API key
         videoId: video ID
         maxpages: max pages of comments to scan
+        model: the ML model to use for sentiment, model choices under ./models
     """
     # Load video comments
     yt = Youtube('https://www.googleapis.com/youtube/v3/commentThreads', apiKey, maxpages)
@@ -19,7 +21,8 @@ def process_video_comments(apiKey, videoId, maxpages):
     top_words = top_freq_words(' '.join(comments))
     print("Frequency distribution: {0}".format(top_words.most_common(20)))
     # Classify sentiment
-    model = load_ml_pipeline("./models/lr_sentiment_basic.pkl")
+    model_path = pkg_resources.resource_filename('youtube_sentiment', 'models/')
+    model = load_ml_pipeline("{0}{1}".format(model_path, model))
     predictions = model.predict(comments)
     ts = total_sentiment(predictions)
     print("Total sentiment scores (Pos, Neg): {0}".format(ts))
@@ -30,7 +33,7 @@ def main():
     parser.add_argument("videoId", help="Enter the Youtube video ID")
     parser.add_argument("maxpages", help="Enter the max pages returned of comments", type=int)
     args = parser.parse_args()
-    process_video_comments(args.apiKey, args.videoId, args.maxpages)
+    process_comments_summary(args.apiKey, args.videoId, args.maxpages)
 
 if __name__ == '__main__':
     main()
