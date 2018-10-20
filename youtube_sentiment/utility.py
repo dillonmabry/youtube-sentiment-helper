@@ -18,7 +18,7 @@ def flatten_list(items):
     if len(items) > 0 and items is not None:
         return list(itertools.chain.from_iterable(items))
 
-def top_freq_words(comments):
+def top_freq_words(comments, topwords):
     """
     Method to return frequency distribution of words from corpus text
     Args:
@@ -28,7 +28,7 @@ def top_freq_words(comments):
     words = tokenizer.tokenize(comments)
     swords = stopwords.words('english')
     freq_words = FreqDist(w.lower() for w in words if w not in swords)   
-    return freq_words
+    return freq_words.most_common(topwords)
 
 def load_ml_pipeline(filename):
     """

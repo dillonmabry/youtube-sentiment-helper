@@ -16,14 +16,19 @@ def process_comments_summary(apiKey, videoId, maxpages, model):
     # Load video comments
     yt = Youtube('https://www.googleapis.com/youtube/v3/commentThreads', apiKey, maxpages)
     comments = yt.get_comments(videoId)
-    print("Total comments: {0}".format(len(comments)))
-    top_words = top_freq_words(' '.join(comments))
-    print("Frequency distribution: {0}".format(top_words.most_common(20)))
+    comments_corpus = ' '.join(comments)
+    top_words = top_freq_words(comments_corpus, topwords=20)
     # Classify sentiment
     model = load_ml_pipeline(model)
     predictions = model.predict(comments)
     ts = total_sentiment(predictions)
-    print("Total sentiment scores (Pos, Neg): {0}".format(ts))
+    print("""
+        Video Summary:
+        --------------------------------------
+        Total sentiment scores (Pos, Neg): {0}
+        Top words by frequency: {1}
+        """
+        .format(ts, top_words))
 
 def main():
     parser = argparse.ArgumentParser()

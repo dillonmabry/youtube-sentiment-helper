@@ -1,6 +1,7 @@
 from unittest import TestCase
 from youtube_sentiment import flatten_list
 from youtube_sentiment import load_ml_pipeline
+from youtube_sentiment import top_freq_words
 
 class TestUtil(TestCase):
     """ Test Utility """
@@ -26,3 +27,11 @@ class TestUtil(TestCase):
         predictions = self.mock.predict(mock_comments)
         self.assertTrue(predictions[0] == 1)
         self.assertTrue(predictions[1] == 0)
+
+    def test_comments_frequency(self):
+        """ Test comments word frequencies """
+        mock_comments = "Hey nice video you made loved it Terrible video worst ever loved it loved"
+        top_words = top_freq_words(mock_comments, topwords=20)
+        self.assertTrue(len(top_words) > 1)
+        print(top_words[0])
+        self.assertTrue(top_words[0] == ("loved", 3))
