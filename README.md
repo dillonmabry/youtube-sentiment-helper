@@ -29,7 +29,7 @@ python setup.py test
 
 ## Traditional ML Model Creation
 
-*Why did you use Twitter sentiment as training?*
+*Why use Twitter sentiment as training?*
 
 Twitter comments/replies/tweets are the closest existing training set to Youtube comments that are the simplest to setup. A deep autoencoder could be used to generate comments for a larger dataset (over 100k) with Youtube-esque comments but then the reliability of classifying the data would be very tricky.
 
