@@ -37,17 +37,22 @@ Twitter comments/replies/tweets are the closest existing training set to Youtube
 
 ```python
 # Develop sentiment analysis classifier using traditional ML models
-# Feature union and pipeline modifications using the following guide: 
+# Pipeline modeling using the following guide: 
 # https://ryan-cranfill.github.io/sentiment-pipeline-sklearn-1/
+# Data processing and cleaning guide:
+# https://towardsdatascience.com/another-twitter-sentiment-analysis-bb5b01ebad90
 
 # Imports
 import numpy as np
 import time
 import pandas as pd
+import matplotlib.pyplot as plt
+import re
+from bs4 import BeautifulSoup
 import nltk
-from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, log_loss
+from sklearn.metrics import accuracy_score, log_loss, confusion_matrix, auc, roc_curve
 from sklearn.model_selection import GridSearchCV
 from sklearn.pipeline import FeatureUnion, Pipeline
 from sklearn.externals import joblib
@@ -56,17 +61,112 @@ from sklearn.model_selection import train_test_split
 
 
 ```python
-# Dataset of ~100,000 Twitter tweets with corresponding labels (positive 1, negative 0)
-# Dataframe columns: ID, Sentiment (score), SentimentText
-train = pd.read_csv('twitter_train.csv', encoding='latin-1')
-test = pd.read_csv('twitter_test.csv', encoding='latin-1')
+# Dataset of 1.6m Twitter tweets
+columns = ['sentiment', 'id', 'date', 'query_string', 'user', 'text']
+train = pd.read_csv('stanford_twitter_train.csv', encoding='latin-1', header=None, names=columns)
+test = pd.read_csv('stanford_twitter_test.csv', encoding='latin-1', header=None, names=columns)
 ```
 
 
 ```python
-X, y = train.SentimentText, train.Sentiment
+## Local helpers
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42)
+# AUC visualization
+def show_roc(model, test, test_labels):
+    # Predict
+    probs = model.predict_proba(test)
+    preds = probs[:,1]
+    fpr, tpr, threshold = roc_curve(test_labels, preds)
+    roc_auc = auc(fpr, tpr)
+    # Chart
+    plt.title('Receiver Operating Characteristic')
+    plt.plot(fpr, tpr, 'b', label = 'AUC = %0.2f' % roc_auc)
+    plt.legend(loc = 'lower right')
+    plt.plot([0, 1], [0, 1],'r--')
+    plt.xlim([0, 1])
+    plt.ylim([0, 1])
+    plt.ylabel('True Positive Rate')
+    plt.xlabel('False Positive Rate')
+    plt.show()
+
+# Tweet cleanser
+tok = nltk.tokenize.WordPunctTokenizer()
+pat1 = r'@[A-Za-z0-9_]+'
+pat2 = r'https?://[^ ]+'
+combined_pat = r'|'.join((pat1, pat2))
+www_pat = r'www.[^ ]+'
+negations_dic = {"isn't":"is not", "aren't":"are not", "wasn't":"was not", "weren't":"were not",
+                "haven't":"have not","hasn't":"has not","hadn't":"had not","won't":"will not",
+                "wouldn't":"would not", "don't":"do not", "doesn't":"does not","didn't":"did not",
+                "can't":"can not","couldn't":"could not","shouldn't":"should not","mightn't":"might not",
+                "mustn't":"must not"}
+neg_pattern = re.compile(r'\b(' + '|'.join(negations_dic.keys()) + r')\b')
+def clean_tweet(text):
+    soup = BeautifulSoup(text, 'lxml')
+    souped = soup.get_text()
+    try:
+        bom_removed = souped.decode("utf-8-sig").replace(u"\ufffd", "?")
+    except:
+        bom_removed = souped
+    stripped = re.sub(combined_pat, '', bom_removed)
+    stripped = re.sub(www_pat, '', stripped)
+    lower_case = stripped.lower()
+    neg_handled = neg_pattern.sub(lambda x: negations_dic[x.group()], lower_case)
+    letters_only = re.sub("[^a-zA-Z]", " ", neg_handled)
+    # During the letters_only process two lines above, it has created unnecessay white spaces,
+    # I will tokenize and join together to remove unneccessary white spaces
+    words = [x for x  in tok.tokenize(letters_only) if len(x) > 1]
+    return (" ".join(words)).strip()
+```
+
+
+```python
+# Data cleaning
+cleaned_tweets = []
+for tweet in train['text']:                                                                 
+    cleaned_tweets.append(clean_tweet(tweet))
+cleaned_df = pd.DataFrame(cleaned_tweets, columns=['text'])
+cleaned_df['target'] = train.sentiment
+cleaned_df.target[cleaned_df.target == 4] = 1 # rename 4 to 1 as positive label
+cleaned_df = cleaned_df[cleaned_df.target != 2] # remove neutral labels
+cleaned_df = cleaned_df.dropna() # drop null records
+cleaned_df.to_csv('stanford_clean_twitter_train.csv',encoding='utf-8')
+```
+
+    C:\Program Files (x86)\Microsoft Visual Studio\Shared\Anaconda3_64\lib\site-packages\bs4\__init__.py:219: UserWarning: "b' i just received my G8 viola exam.. and its... well... .. disappointing.. :\\..'" looks like a filename, not markup. You should probably open this file and pass the filehandle into Beautiful Soup.
+      ' Beautiful Soup.' % markup)
+    C:\Program Files (x86)\Microsoft Visual Studio\Shared\Anaconda3_64\lib\site-packages\bs4\__init__.py:219: UserWarning: "b'E3 ON PLAYSTATION HOME IN ABOUT AN HOUR!!!!!!!!!! \\../  \\../'" looks like a filename, not markup. You should probably open this file and pass the filehandle into Beautiful Soup.
+      ' Beautiful Soup.' % markup)
+    C:\Program Files (x86)\Microsoft Visual Studio\Shared\Anaconda3_64\lib\site-packages\ipykernel_launcher.py:7: SettingWithCopyWarning: 
+    A value is trying to be set on a copy of a slice from a DataFrame
+    
+    See the caveats in the documentation: http://pandas.pydata.org/pandas-docs/stable/indexing.html#indexing-view-versus-copy
+      import sys
+    
+
+
+```python
+# Starting point from import
+csv = 'stanford_clean_twitter_train.csv'
+df = pd.read_csv(csv,index_col=0)
+```
+
+    C:\Program Files (x86)\Microsoft Visual Studio\Shared\Anaconda3_64\lib\site-packages\numpy\lib\arraysetops.py:472: FutureWarning: elementwise comparison failed; returning scalar instead, but in the future will perform elementwise comparison
+      mask |= (ar1 == a)
+    
+
+
+```python
+# Random shuffle and ensure no null records
+df = df.sample(frac=1).reset_index(drop=True)
+df = df.dropna() # drop null records
+```
+
+
+```python
+X, y = df.text[0:200000], df.target[0:200000] # Max data size 200k for memory purposes
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42, test_size=0.10)
 ```
 
 
@@ -74,88 +174,38 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42)
 # Dataset shapes post-split
 print(np.shape(X_train))
 print(np.shape(X_test))
-print(np.shape(y_train))
-print(np.shape(y_test))
 print(np.unique(y_train))
-print(np.unique(y_test))
 ```
 
-    (74991,)
-    (24998,)
-    (74991,)
-    (24998,)
-    [0 1]
+    (180000,)
+    (20000,)
     [0 1]
     
 
 
 ```python
 # NLTK Twitter tokenizer best used for short comment-type text sets
-tokenizer = nltk.casual.TweetTokenizer(preserve_case=False, reduce_len=True)
-```
-
-
-```python
-# Replace @ mentions with generic token
-import re
-
-def replace_mentions(text):
-    return re.sub(r'@[\w_-]+', 'MENTION', text)
-```
-
-
-```python
-from sklearn.preprocessing import FunctionTransformer
-
-def pipeline_function(function, active=True):
-    def list_comprehend_a_function(list_or_series, active=True):
-        if active:
-            return [function(i) for i in list_or_series]
-        else: # if it's not active, just pass it right back
-            return list_or_series
-    return FunctionTransformer(list_comprehend_a_function, validate=False, kw_args={'active':active})
-```
-
-
-```python
-def get_post_length(text):
-    return len(text)
-```
-
-
-```python
-# Add custom features (namely length, since longer comments/posts will most likely be either positive or negative)
-# Utilize FeatureUnion class
-
-def reshape_a_feature_column(series):
-    return np.reshape(np.asarray(series), (len(series), 1))
-
-def pipeline_feature(function, active=True):
-    def list_comprehend_a_function(list_or_series, active=True):
-        if active:
-            processed = [function(i) for i in list_or_series]
-            processed = reshape_a_feature_column(processed)
-            return processed
-        # If a feature is deactivated, we're going to just return a column of zeroes.
-        else:
-            return reshape_a_feature_column(np.zeros(len(list_or_series)))
+import nltk
+tokenizer = nltk.casual.TweetTokenizer(preserve_case=False)
 ```
 
 
 ```python
 # Hyperparameter tuning (Simple model)
-cvect = CountVectorizer(tokenizer=tokenizer.tokenize) 
+#cvect = CountVectorizer(tokenizer=tokenizer.tokenize)
+tfidf = TfidfVectorizer()
 clf = LogisticRegression()
 
 pipeline = Pipeline([
-        ('cvect', cvect),
+        ('tfidf', tfidf),
         ('clf', clf)
     ])
 
 parameters = {
-    'cvect__ngram_range': [(1,1), (1,2), (1,3)], # ngram range of tokenizer
-    'cvect__max_df': [0.25, 0.5, 1.0], # maximum document frequency for the CountVectorizer
-    'clf__C': np.logspace(-1, 0, 2) # C value for the LogisticRegression
+    'tfidf__ngram_range': [(1,1), (1,2), (1,3)], # ngram range of tokenizer
+    'tfidf__norm': ['l1', 'l2', None], # term vector normalization
+    'tfidf__max_df': [0.25, 0.5, 1.0], # maximum document frequency for the CountVectorizer
+    'clf__C': np.logspace(-2, 0, 3) # C value for the LogisticRegression
 }
 
 grid = GridSearchCV(pipeline, parameters, cv=3, verbose=1)
@@ -174,20 +224,21 @@ for param_name in sorted(parameters.keys()):
 ```
 
     Performing grid search...
-    pipeline: ['cvect', 'clf']
-    Fitting 3 folds for each of 18 candidates, totalling 54 fits
+    pipeline: ['tfidf', 'clf']
+    Fitting 3 folds for each of 81 candidates, totalling 243 fits
     
 
-    [Parallel(n_jobs=1)]: Done  54 out of  54 | elapsed: 13.3min finished
+    [Parallel(n_jobs=1)]: Done 243 out of 243 | elapsed: 52.7min finished
     
 
-    done in 826.190s
+    done in 3186.295s
     
-    Best score: 0.783
+    Best score: 0.803
     Best parameters set:
-    	clf__C: 1.0
-    	cvect__max_df: 0.5
-    	cvect__ngram_range: (1, 3)
+    	clf__C: 0.01
+    	tfidf__max_df: 0.25
+    	tfidf__ngram_range: (1, 3)
+    	tfidf__norm: None
     
 
 
@@ -205,54 +256,49 @@ joblib.dump(grid.best_estimator_, 'lr_sentiment_cv.pkl', compress=1)
 
 
 ```python
-# Hyperparameter tuning (Slightly advanced model)
-tokenizer_lowercase = nltk.casual.TweetTokenizer(preserve_case=False, reduce_len=False)
-tokenizer_lowercase_reduce_len = nltk.casual.TweetTokenizer(preserve_case=False, reduce_len=True)
-tokenizer_uppercase = nltk.casual.TweetTokenizer(preserve_case=True, reduce_len=False)
-tokenizer_uppercase_reduce_len = nltk.casual.TweetTokenizer(preserve_case=True, reduce_len=True)
-
-parameters = {
-    'mentions_replace__kw_args': [{'active':False}, {'active':True}], # genericizing mentions on/off
-    'features__post_length__kw_args': [{'active':False}, {'active':True}], # adding post length feature on/off
-    'features__cvect__ngram_range': [(1,1), (1,2), (1,3)], # ngram range of tokenizer
-    'features__cvect__tokenizer': [tokenizer_lowercase.tokenize, # differing parameters for the TweetTokenizer
-                                        tokenizer_lowercase_reduce_len.tokenize,
-                                        tokenizer_uppercase.tokenize,
-                                        tokenizer_uppercase_reduce_len.tokenize,
-                                        None], # None will use the default tokenizer
-    'features__cvect__max_df': [0.25, 0.5], # maximum document frequency for the CountVectorizer
-    'clf__C': np.logspace(-2, 0, 3) # C value for the LogisticRegression
-}
-
-grid = GridSearchCV(pipeline, parameters, cv=5, verbose=1)
-print("Performing grid search...")
-print("pipeline:", [name for name, _ in pipeline.steps])
-t0 = time.time()
-grid.fit(X_train, y_train)
-print("done in %0.3fs" % (time.time() - t0))
-print()
-
-print("Best score: %0.3f" % grid.best_score_)
-print("Best parameters set:")
-best_parameters = grid.best_estimator_.get_params()
-for param_name in sorted(parameters.keys()):
-    print("\t%s: %r" % (param_name, best_parameters[param_name]))
+# Starting point 2: Post-model load comparison
+lra = joblib.load('./Models/Stanford_Twitter_Models/lr_sentiment_cv.pkl') 
+lrb = joblib.load('./Models/Twitter_Simple_Models/lr_sentiment_basic.pkl') 
 ```
 
 
 ```python
-# Dump model from grid search cv
-joblib.dump(grid.best_estimator_, 'lr_sentiment_adv_cv.pkl', compress=1)
+# Model performance indicators for basic model
+y_pred_basic = lrb.predict(X_test)
+print(confusion_matrix(y_test, y_pred_basic))
+show_roc(lrb, X_test, y_test) # AUC
 ```
+
+    [[7562 2347]
+     [2181 7910]]
+    
+
+
+![png](output_12_1.png)
+
 
 
 ```python
-grid.predict(["that was the best movie ever"])
+# Model performance indicators for hypertuned model
+y_pred_hyper = lra.predict(X_test)
+print(confusion_matrix(y_test, y_pred_hyper))
+show_roc(lra, X_test, y_test) # AUC
 ```
 
+    [[7861 2048]
+     [1863 8228]]
+    
+
+
+![png](output_13_1.png)
 
 
 
-    array([1], dtype=int64)
+```python
+print(lrb.predict(["terrible idea why was this even made"]))
+print(lrb.predict(["that was the best movie ever"]))
+```
 
-
+    [0]
+    [1]
+    
