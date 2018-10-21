@@ -1,7 +1,7 @@
 import argparse
 from youtube_sentiment import Youtube
 from youtube_sentiment import load_ml_pipeline
-from youtube_sentiment import total_sentiment
+from youtube_sentiment import total_counts
 from youtube_sentiment import top_freq_words
 
 def process_comments_summary(apiKey, videoId, maxpages, model):
@@ -21,7 +21,7 @@ def process_comments_summary(apiKey, videoId, maxpages, model):
     # Classify sentiment
     model = load_ml_pipeline(model)
     predictions = model.predict(comments)
-    ts = total_sentiment(predictions)
+    ts = total_counts(predictions)
     print("""
         Video Summary:
         --------------------------------------

@@ -43,14 +43,14 @@ def load_ml_pipeline(filename):
         except Exception as e:
             raise e
 
-def total_sentiment(sentiment_scores):
+def total_counts(arrcounts):
     """
-    Method to calculate total sentiment for a video based on threshold of comments
-    Returns tuple of number of positive vs. negative sentiment comments
-    Example: (pos: 100, neg: 50)
+    Method to calculate the total counts of values in numpy array
+    Returns tuple of number of 1 vs. 0 counts
+    Example: (100, 50)
     Args:
-        sentiment_scores: list of sentiments for each comment (0 neg, 1 pos)
+        arrcounts: numpy array of values
     """
-    counts = np.bincount(sentiment_scores)
-    return (counts[1], counts[0]) # pos, neg
+    counts = np.bincount(arrcounts)
+    return (counts[1], counts[0]) # totals 1s, 0s
     

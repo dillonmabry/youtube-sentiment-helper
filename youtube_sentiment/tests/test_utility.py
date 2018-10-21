@@ -1,7 +1,9 @@
 from unittest import TestCase
+import numpy as np
 from youtube_sentiment import flatten_list
 from youtube_sentiment import load_ml_pipeline
 from youtube_sentiment import top_freq_words
+from youtube_sentiment import total_counts
 
 class TestUtil(TestCase):
     """ Test Utility """
@@ -35,3 +37,9 @@ class TestUtil(TestCase):
         self.assertTrue(len(top_words) > 1)
         print(top_words[0])
         self.assertTrue(top_words[0] == ("loved", 3))
+
+    def test_arr_counts(self):
+        """ Test numpy counts of values """
+        mock_counts = np.array([0, 0, 1, 1, 1])
+        counts = total_counts(mock_counts)
+        self.assertTrue(counts == (3, 2))
