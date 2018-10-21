@@ -257,7 +257,7 @@ show_roc(lrb, X_test, y_test) # AUC
     
 
 
-![png](output_12_1.png)
+![basic_auc](https://user-images.githubusercontent.com/10522556/47269973-06dd1280-d533-11e8-8686-284702733082.png)
 
 
 
@@ -273,7 +273,7 @@ show_roc(lra, X_test, y_test) # AUC
     
 
 
-![png](output_13_1.png)
+![cv_auc](https://user-images.githubusercontent.com/10522556/47269972-06dd1280-d533-11e8-99d6-a2b211f73185.png)
 
 
 
