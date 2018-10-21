@@ -133,28 +133,11 @@ cleaned_df = cleaned_df.dropna() # drop null records
 cleaned_df.to_csv('stanford_clean_twitter_train.csv',encoding='utf-8')
 ```
 
-    C:\Program Files (x86)\Microsoft Visual Studio\Shared\Anaconda3_64\lib\site-packages\bs4\__init__.py:219: UserWarning: "b' i just received my G8 viola exam.. and its... well... .. disappointing.. :\\..'" looks like a filename, not markup. You should probably open this file and pass the filehandle into Beautiful Soup.
-      ' Beautiful Soup.' % markup)
-    C:\Program Files (x86)\Microsoft Visual Studio\Shared\Anaconda3_64\lib\site-packages\bs4\__init__.py:219: UserWarning: "b'E3 ON PLAYSTATION HOME IN ABOUT AN HOUR!!!!!!!!!! \\../  \\../'" looks like a filename, not markup. You should probably open this file and pass the filehandle into Beautiful Soup.
-      ' Beautiful Soup.' % markup)
-    C:\Program Files (x86)\Microsoft Visual Studio\Shared\Anaconda3_64\lib\site-packages\ipykernel_launcher.py:7: SettingWithCopyWarning: 
-    A value is trying to be set on a copy of a slice from a DataFrame
-    
-    See the caveats in the documentation: http://pandas.pydata.org/pandas-docs/stable/indexing.html#indexing-view-versus-copy
-      import sys
-    
-
-
 ```python
 # Starting point from import
 csv = 'stanford_clean_twitter_train.csv'
 df = pd.read_csv(csv,index_col=0)
 ```
-
-    C:\Program Files (x86)\Microsoft Visual Studio\Shared\Anaconda3_64\lib\site-packages\numpy\lib\arraysetops.py:472: FutureWarning: elementwise comparison failed; returning scalar instead, but in the future will perform elementwise comparison
-      mask |= (ar1 == a)
-    
-
 
 ```python
 # Random shuffle and ensure no null records
