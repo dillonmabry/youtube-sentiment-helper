@@ -21,10 +21,13 @@ python setup.py test
 ```
 ## To-Do
 - [X] Create API to use Youtube API V3 via REST to get comments for videos
+- [X] Create initial Python package
 - [X] Analyze existing sentiment analysis models to select and use
-- [ ] Improve/enhance sentiment learning model
+- [X] Improve/enhance existing sentiment learning model
+- [ ] Create deep model for sentiment
 - [ ] Utilize sentiment analysis to analyze Youtube video and provide analytics
-- [ ] Finalize and create Python package for project 
+- [ ] Finalize Python package for project
+- [ ] Fix any existing bugs
 - [ ] Create web based portal
 
 ## Traditional ML Model Creation
