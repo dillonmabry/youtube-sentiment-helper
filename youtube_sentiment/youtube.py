@@ -53,8 +53,13 @@ class Youtube(object):
                 return flatten_list(all_comments)
             elif (r.status_code == requests.codes.forbidden):
                 self.logger.error("Status: {0} | API Key is incorrect or restricted.".format(r.status_code))
-            else: 
+                raise Exception("API Key is incorrect or not valid")
+            elif (r.status_code == requests.codes.not_found): 
+                self.logger.error("Status: {0} | Video not found".format(r.status_code))
+                raise Exception("VideoId not found or internal Youtube API error")
+            else:
                 self.logger.error("Status: {0} | An error has occurred".format(r.status_code))
+                raise Exception("API Key is incorrect or internal Youtube API error")
         except RequestException as e:
             self.logger.exception(str(e))
             raise

@@ -16,6 +16,9 @@ def process_comments_summary(apiKey, videoId, maxpages, model):
     # Load video comments
     yt = Youtube('https://www.googleapis.com/youtube/v3/commentThreads', apiKey, maxpages)
     comments = yt.get_comments(videoId)
+    if comments is None:
+        print("Oops, something went wrong, check log info")
+        return
     comments_corpus = ' '.join(comments)
     top_words = top_freq_words(comments_corpus, topwords=20)
     # Classify sentiment

@@ -9,7 +9,7 @@ class TestYT(TestCase):
     @classmethod
     def setUpClass(self):
         """ Setup """
-        self.yt = Youtube('FAKE_API_KEY', 'FAKE_VIDEO_ID', 9999) # for testing only, service creation
+        self.yt = Youtube('https://www.googleapis.com/youtube/v3/commentThreads', 'FAKE_API_KEY', 5) # for testing only, service creation
 
     """ Youtube API test cases """
     def test_endpoint(self):
@@ -17,6 +17,11 @@ class TestYT(TestCase):
         r = requests.get(url='https://www.googleapis.com/youtube/v3/commentThreads')
         self.assertTrue(r.status_code == requests.codes.ok or 
                 r.status_code == requests.codes.bad_request)
+
+    def test_api_errors(self):
+        """ Test requests errors handling """
+        with self.assertRaises(Exception) as mock:
+            r = self.yt.get_comments("wyG2xN5")
 
     def test_comments_structure(self):
         """ Check Youtube class comments structure for json """
