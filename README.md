@@ -8,7 +8,7 @@ Helper tool to make requests to a machine learning model in order to determine s
 Current usage:
 ```
 import youtube_sentiment as yt
-yt.process_comments_summary(<Youtube API Key>, <Youtube Video ID>, <Max Pages of Comments>, <Sentiment Model>) 
+yt.video_summary(<Youtube API Key>, <Youtube Video ID>, <Max Pages of Comments>, <Sentiment Model>) 
 ```
 or
 ```
