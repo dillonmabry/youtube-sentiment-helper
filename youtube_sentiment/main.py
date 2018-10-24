@@ -21,14 +21,15 @@ def process_comments_summary(apiKey, videoId, maxpages, model):
     # Classify sentiment
     model = load_ml_pipeline(model)
     predictions = model.predict(comments)
-    ts = total_counts(predictions)
+    pos, neg = total_counts(predictions)
     print("""
         Video Summary:
         --------------------------------------
-        Total sentiment scores (Pos, Neg): {0}
-        Top words by frequency: {1}
+        Total sentiment scores (Pos, Neg): {0}, {1}
+        Percentage Negative Sentiment: {2}
+        Top words by frequency: {3}
         """
-        .format(ts, top_words))
+        .format(pos, neg, (neg / (pos + neg)), top_words))
 
 def main():
     parser = argparse.ArgumentParser()
