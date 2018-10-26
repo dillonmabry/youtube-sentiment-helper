@@ -30,6 +30,12 @@ python setup.py test
 - [ ] Fix any existing bugs
 - [ ] Create web based portal
 
+## Models Available
+ - lr_sentiment_basic (Basic Vectorizer/Logistic Regression model, 2 MB)
+ - lr_sentiment_cv (Hypertuned TFIDF/Logistic Regression model with clean dataset, 60 MB)
+ - *To-be-added* cnn_sentiment (Convolutional Neural Net model)
+ - *To-be-added* cnn_sentiment (LTSM Neural Net model)
+
 ## Traditional ML Model Creation
 
 *Why use Twitter sentiment as training?*
