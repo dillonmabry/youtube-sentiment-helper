@@ -5,6 +5,7 @@ def post_install():
       """Post installation nltk corpus downloads."""
       import nltk
       nltk.download("punkt")
+      nltk.download('words')
       nltk.download('maxent_ne_chunker')
       nltk.download('averaged_perceptron_tagger')
       nltk.download("stopwords")
