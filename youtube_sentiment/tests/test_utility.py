@@ -1,9 +1,10 @@
 from unittest import TestCase
-import numpy as np
+from numpy import array as nparray
 from youtube_sentiment import flatten_list
 from youtube_sentiment import load_ml_pipeline
 from youtube_sentiment import top_freq_words
 from youtube_sentiment import total_counts
+from youtube_sentiment import extract_entities
 
 class TestUtil(TestCase):
     """ Test Utility """
@@ -40,6 +41,13 @@ class TestUtil(TestCase):
 
     def test_arr_counts(self):
         """ Test numpy counts of values """
-        mock_counts = np.array([0, 0, 1, 1, 1])
+        mock_counts = nparray([0, 0, 1, 1, 1])
         counts = total_counts(mock_counts)
         self.assertTrue(counts == (3, 2))
+
+    def test_extract_entities(self):
+        """ Test entity extract via NLTK """
+        mock_comments = "Hey nice video you made loved it Mike is in Japan right now good job"
+        entities = extract_entities(mock_comments)
+        self.assertTrue(len(entities) > 0)
+        self.assertTrue(entities[0] == "Mike")

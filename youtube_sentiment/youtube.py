@@ -40,7 +40,7 @@ class Youtube(object):
                 all_comments = []
                 self.logger.info("API request endpoint: {0} | Video requested: {1}".format(
                     self.endpoint, videoId))
-                all_comments.append(self.get_comments_values(r.json()))
+                all_comments.append(self.get_comments_threads(r.json()))
                 nextPageToken = r.json().get('nextPageToken')
                 idx = 0
                 while(nextPageToken and idx < self.maxpages):
@@ -48,7 +48,7 @@ class Youtube(object):
                     r_next = self.session.request(method='get', url=self.endpoint, params=payload)
                     if(r_next.status_code == requests.codes.ok):
                         nextPageToken = r_next.json().get("nextPageToken")
-                        all_comments.append(self.get_comments_values(r_next.json()))
+                        all_comments.append(self.get_comments_threads(r_next.json()))
                         idx = idx + 1
                 return flatten_list(all_comments)
             elif (r.status_code == requests.codes.forbidden):
@@ -64,12 +64,12 @@ class Youtube(object):
             self.logger.exception(str(e))
             raise
 
-    def get_comments_values(self, comments):
+    def get_comments_threads(self, comments):
         """
-        Method to return video comments based on input
+        Method to return all comments from Youtube comment threads
         Args:
             self
-            comments: list of response json comments
+            comments: list of response json comments including replies
         """
         try:
             all_comments = []

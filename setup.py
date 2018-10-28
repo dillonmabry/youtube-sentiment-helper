@@ -1,4 +1,17 @@
 from setuptools import setup
+from setuptools.command.install import install
+
+def post_install():
+      """Post installation nltk corpus downloads."""
+      import nltk
+      nltk.download("punkt")
+      nltk.download("stopwords")
+
+class PostInstall(install):
+      """Post-installation"""
+      def run(self):
+            install.run(self)
+            self.execute(post_install, [], msg="Running post installation tasks")
 
 setup(name='youtube_sentiment',
       version='0.1',
@@ -10,6 +23,8 @@ setup(name='youtube_sentiment',
       packages=['youtube_sentiment'],
       test_suite='nose.collector',
       tests_require=['nose'],
+      install_requires=["requests", "nltk", "numpy", "scipy", "scikit-learn"],
+      cmdclass={"install": PostInstall},
       include_package_data=True,
       data_files=[('', [
             'youtube_sentiment/models/lr_sentiment_basic.pkl', 
