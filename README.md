@@ -9,7 +9,9 @@ Determine sentiment of Youtube video per comment based analysis using Sci-kit by
 Helper tool to make requests to a machine learning model in order to determine sentiment using the Youtube API.
 
 ## Install Instructions
-`pip install .`
+```
+pip install .
+```
 ## How to Use
 Current usage:
 ```
