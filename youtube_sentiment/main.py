@@ -24,7 +24,7 @@ def tagged_comments(apiKey, videoId, maxpages, model):
 
 def main():
     """
-    Main argparse method
+    Main argparse for command line
     """
     parser = argparse.ArgumentParser()
     parser.add_argument("apiKey", help="Enter the Youtube API key to use for requests")
