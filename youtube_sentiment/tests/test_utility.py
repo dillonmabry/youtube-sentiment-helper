@@ -11,7 +11,6 @@ class TestUtil(TestCase):
     @classmethod
     def setUpClass(self):
         """ Setup """
-        self.mock = load_ml_pipeline("lr_sentiment_basic.pkl")
 
     """ Utility class tests """
     def test_flatten_list(self):
@@ -21,13 +20,17 @@ class TestUtil(TestCase):
 
     def test_load_model(self):
         """ Test loading of a model """
-        self.assertTrue(self.mock != None)
-        self.assertTrue(hasattr(self.mock, 'predict'))
+        mock = load_ml_pipeline("lr_sentiment_basic.pkl")
+        self.assertTrue(mock != None)
+        self.assertTrue(hasattr(mock, 'predict'))
+        with self.assertRaises(Exception) as mockexception:
+            r = load_ml_pipeline("lr_sentiment_findme.pkl")
 
     def test_model_predict(self):
         """ Test model sentiment predict and action """
         mock_comments = ["Hey nice video you made loved it", "Terrible video worst ever"]
-        predictions = self.mock.predict(mock_comments)
+        mock = load_ml_pipeline("lr_sentiment_basic.pkl")
+        predictions = mock.predict(mock_comments)
         self.assertTrue(predictions[0] == 1)
         self.assertTrue(predictions[1] == 0)
 
