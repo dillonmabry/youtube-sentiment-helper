@@ -21,7 +21,7 @@ class PostInstall(install):
             self.execute(post_install, [], msg="Running post installation tasks")
 
 setup(name='youtube_sentiment',
-      version='0.1',
+      version='0.2.0',
       description='Analyze Youtube videos for general sentiment analysis',
       long_description=readme(),
       long_description_content_type='text/markdown',
