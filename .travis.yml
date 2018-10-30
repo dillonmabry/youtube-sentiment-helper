@@ -1,10 +1,17 @@
 language: python
 python:
-  - "3.4"
-  - "3.5"
-  - "3.6"
+- '3.4'
+- '3.5'
+- '3.6'
 install:
-  - pip install .
+- pip install .
 script:
-  - python setup.py test
+- python setup.py test
 cache: pip
+deploy:
+  provider: pypi
+  user: rapiddevsolutions
+  password:
+    secure: SAGNL/xvudb25GJ2szYUgfgarXTYnnCtmZ5cLx3yUgYLxITngYLMhXzUq2rUOwk5X0j69O4c3l21ku+/GLRQNbGveZQeKp0gljTYYvR/8+uOxr4lLsUQ8sZWQmcfk9jU8l1ZY5A5qPiatwryZcprKzteYcvoeFGESouuP+TFB48IawJS5lCg0ZMpxfGztuTjCmmoLeca3NHlhn9y9jROMqevee+eqI7LLtGaA4szd4V0T4LoZDsUcCgoU6HXoOyf5aEdDcTXv1uLa2tqntBg+A1yoMXuv2ZHmRY7Y3K7IXHTDgd0UeaJKIz8/RFkWw29VhsOyqr5tm37i8avFT4bIV7ByV6r/M8lFZiz3LnshYAG3UmIvL+FwjXvff8f3kFlfEtQV//D7y7tef7VRNqaXp95+LiymiW9xTs5D5zmYT5fhCg10Iv9kP7Jb6V5U06Ss0Ya+1SMh5qnCaH9Vy+GUSLVFcTTZvgcHgHTPhBIol6ju4tF+2hRFA/vyWeUiyNw1vvtakY/vGhgY1mDcZgMBuOU97AM71Dk+MVGPDj9O0SifzJmfnc2P2Zz7hV7ljNUbwYPCgbbj/R6EbjhT56hYCL5dmtg6MDDpIy4vlYYrNy5NBgZ3EAVWDug2DK2QCYKq/LZEQgKVxJkAmvP35DV8JTxt+dPmhmLUETTmGpqcWo=
+  on:
+    tags: true
