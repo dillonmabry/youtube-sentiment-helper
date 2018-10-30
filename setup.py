@@ -1,6 +1,10 @@
 from setuptools import setup
 from setuptools.command.install import install
 
+def readme():
+      with open('README.md') as f:
+            return f.read()
+
 def post_install():
       """Post installation nltk corpus downloads."""
       import nltk
@@ -19,6 +23,8 @@ class PostInstall(install):
 setup(name='youtube_sentiment',
       version='0.1',
       description='Analyze Youtube videos for general sentiment analysis',
+      long_description=readme(),
+      long_description_content_type='text/markdown',
       url='https://github.com/dillonmabry/youtube-sentiment-helper',
       author='Dillon Mabry',
       author_email='rapid.dev.solutions@gmail.com',
