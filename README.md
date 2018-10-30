@@ -12,6 +12,10 @@ Helper tool to make requests to a machine learning model in order to determine s
 ```
 pip install .
 ```
+or PyPI (https://pypi.org/project/youtube-sentiment/)
+```
+pip install youtube-sentiment
+```
 ## How to Use
 Current usage:
 ```
