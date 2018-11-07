@@ -37,9 +37,9 @@ python setup.py test
 - [X] Analyze existing sentiment analysis models to select and use
 - [X] Improve/enhance existing sentiment learning model
 - [ ] Create deep model for sentiment
-- [ ] Utilize sentiment analysis to analyze Youtube video and provide analytics
-- [ ] Finalize Python package for project
-- [ ] Fix any existing bugs
+- [X] Utilize sentiment analysis to analyze Youtube video and provide analytics
+- [X] Finalize Python package for project
+- [ ] Fix any new bugs
 - [ ] Create web based portal
 
 ## Models Available
