@@ -39,7 +39,6 @@ class TestUtil(TestCase):
         mock_comments = "Hey nice video you made loved it Terrible video worst ever loved it loved"
         top_words = top_freq_words(mock_comments, topwords=20)
         self.assertTrue(len(top_words) > 1)
-        print(top_words[0])
         self.assertTrue(top_words[0] == ("loved", 3))
 
     def test_arr_counts(self):
@@ -53,4 +52,4 @@ class TestUtil(TestCase):
         mock_comments = "Hey nice video you made loved it Mike is in Japan right now good job"
         entities = extract_entities(mock_comments)
         self.assertTrue(len(entities) > 0)
-        self.assertTrue(entities[0] == "Mike")
+        self.assertTrue("Mike" in entities)

@@ -38,7 +38,7 @@ class TestUtil(TestCase):
         mock_comments = ["Was a great movie the character Jude was good", "Terrible movie and awful not recommend", "Worst I have ever seen"]
         with self.captured_output() as (out, err):
             self.mock.process_comments_summary(mock_comments)
-            printout = out.getvalue().strip()
+            printout = out.getvalue().strip() # capture stdout for summary test
             self.assertTrue("Total sentiment scores (Pos, Neg): 1, 2" in printout)
             self.assertTrue("Percentage Negative Sentiment: 0.6666666666666666" in printout)
             self.assertTrue("Top words by frequency: [('movie', 2)" in printout)
