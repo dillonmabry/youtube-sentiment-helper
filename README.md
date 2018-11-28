@@ -274,9 +274,9 @@ joblib.dump(grid.best_estimator_, 'lr_sentiment_cv.pkl', compress=3) # compressi
 
 
 ```python
-# Checkpoint 2: Skip ahead here to train basic model once we know optimal hyperparameters GridSearch with cross-validation
+# Checkpoint 2: Skip ahead here to train basic model once we know optimal hyperparameters
 # Some thoughts:
-# 1. Exclude analyzing tweet length since it does not enhance/degrade model performance, leading to simpler model
+# 1. Exclude analyzing tweet length since it does not enhance/degrade model performance
 # 2. Tfidf performs better than standard countvector analysis which is a bit more in-depth for analysis
 tfidf = TfidfVectorizer(tokenizer=tokenizer.tokenize, ngram_range=(1,3), max_df=0.25, norm=None)
 clf = LogisticRegression(C=0.01)
@@ -297,8 +297,8 @@ pipeline.fit(X_train, y_train)
 
 
 ```python
-scores = cross_val_score(pipeline, X_train, y_train, cv=10) # Cross-validate basic model from discovered hyper-params
-print(scores.mean()) # basic model tuned actually performs with higher accuracy however we should test holdout dataset
+scores = cross_val_score(pipeline, X_train, y_train, cv=10) # Cross-validate basic model
+print(scores.mean()) # basic model tuned performs better, test with holdout set later
 ```
 
     0.8156866699389553
