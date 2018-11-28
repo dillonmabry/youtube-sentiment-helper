@@ -56,12 +56,13 @@ Twitter comments/replies/tweets are the closest existing training set to Youtube
 
 **TLDR: It is the simplest and most effective to bootstrap for a traditional model**
 
+
+
 ```python
-# Develop sentiment analysis classifier using traditional ML models
-# Pipeline modeling using the following guide: 
-# https://ryan-cranfill.github.io/sentiment-pipeline-sklearn-1/
-# Data processing and cleaning guide:
-# https://towardsdatascience.com/another-twitter-sentiment-analysis-bb5b01ebad90
+# Twitter Sentiment Analysis using traditional ML techniques
+# Pipeline modeling using the following guide: https://ryan-cranfill.github.io/sentiment-pipeline-sklearn-1/
+# Data processing and cleaning guide: https://towardsdatascience.com/another-twitter-sentiment-analysis-bb5b01ebad90
+# Stanford Twitter dataset used: http://help.sentiment140.com/for-students/
 
 # Imports
 import numpy as np
@@ -73,11 +74,11 @@ from bs4 import BeautifulSoup
 import nltk
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, log_loss, confusion_matrix, auc, roc_curve
+from sklearn.metrics import confusion_matrix, auc, roc_curve, classification_report
 from sklearn.model_selection import GridSearchCV
 from sklearn.pipeline import FeatureUnion, Pipeline
 from sklearn.externals import joblib
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, cross_val_score
 ```
 
 
@@ -93,14 +94,14 @@ test = pd.read_csv('stanford_twitter_test.csv', encoding='latin-1', header=None,
 ## Local helpers
 
 # AUC visualization
-def show_roc(model, test, test_labels):
+def show_roc(title, model, test, test_labels):
     # Predict
     probs = model.predict_proba(test)
     preds = probs[:,1]
     fpr, tpr, threshold = roc_curve(test_labels, preds)
     roc_auc = auc(fpr, tpr)
     # Chart
-    plt.title('Receiver Operating Characteristic')
+    plt.title(title)
     plt.plot(fpr, tpr, 'b', label = 'AUC = %0.2f' % roc_auc)
     plt.legend(loc = 'lower right')
     plt.plot([0, 1], [0, 1],'r--')
@@ -110,7 +111,7 @@ def show_roc(model, test, test_labels):
     plt.xlabel('False Positive Rate')
     plt.show()
 
-# Tweet cleanser
+# Tweet cleanser, removes hashtags, hyperlinks, cleanse data into phrases
 tok = nltk.tokenize.WordPunctTokenizer()
 pat1 = r'@[A-Za-z0-9_]+'
 pat2 = r'https?://[^ ]+'
@@ -135,9 +136,29 @@ def clean_tweet(text):
     neg_handled = neg_pattern.sub(lambda x: negations_dic[x.group()], lower_case)
     letters_only = re.sub("[^a-zA-Z]", " ", neg_handled)
     # During the letters_only process two lines above, it has created unnecessay white spaces,
-    # I will tokenize and join together to remove unneccessary white spaces
+    # Tokenize and join together to remove unneccessary white spaces
     words = [x for x  in tok.tokenize(letters_only) if len(x) > 1]
     return (" ".join(words)).strip()
+
+# NLTK Twitter tokenizer best used for short comment-type text sets
+tokenizer = nltk.casual.TweetTokenizer(preserve_case=False)
+
+# Model reporting and scoring
+def show_model_report(title, model, preds, X_test, y_test):
+    print(confusion_matrix(y_test, preds))
+    show_roc(title, model, X_test, y_test) # AUC report
+
+def show_misclassified(preds, X_test, y_test):
+    mis_index = np.where(y_test != preds)
+    mis_df = pd.DataFrame()
+    for index in mis_index:
+        predict_vals = preds[index]
+        features = X_test[index]
+        actual_vals = y_test[index]
+        mis_df = pd.DataFrame({'predicted_vals': predict_vals, 'actual_vals':actual_vals, 'features': features})
+        mis_df = mis_df.dropna()
+        mis_df = mis_df[mis_df.actual_vals != mis_df.predicted_vals]
+    print(mis_df.head())
 ```
 
 
@@ -154,23 +175,30 @@ cleaned_df = cleaned_df.dropna() # drop null records
 cleaned_df.to_csv('stanford_clean_twitter_train.csv',encoding='utf-8')
 ```
 
+
 ```python
-# Starting point from import
+# Checkpoint 1: from import clean dataset
 csv = 'stanford_clean_twitter_train.csv'
 df = pd.read_csv(csv,index_col=0)
 ```
 
+    C:\Program Files (x86)\Microsoft Visual Studio\Shared\Anaconda3_64\lib\site-packages\numpy\lib\arraysetops.py:472: FutureWarning: elementwise comparison failed; returning scalar instead, but in the future will perform elementwise comparison
+      mask |= (ar1 == a)
+    
+
+
 ```python
-# Random shuffle and ensure no null records
+# Ensure no N/As, our dataset does have very few N/As post-cleanse, therefore omission is best course of action
+df = df.dropna()
+# shuffle for data subset, distributions should be even since entire dataset is split 50/50 anyway
 df = df.sample(frac=1).reset_index(drop=True)
-df = df.dropna() # drop null records
 ```
 
 
 ```python
-X, y = df.text[0:200000], df.target[0:200000] # Max data size 200k for memory purposes
+X, y = df.text[0:500000], df.target[0:500000] # Data subset for performance reasons, though more data helps
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42, test_size=0.10)
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=123, test_size=0.10)
 ```
 
 
@@ -181,17 +209,25 @@ print(np.shape(X_test))
 print(np.unique(y_train))
 ```
 
-    (180000,)
-    (20000,)
+    (450000,)
+    (50000,)
     [0 1]
     
 
 
 ```python
-# NLTK Twitter tokenizer best used for short comment-type text sets
-import nltk
-tokenizer = nltk.casual.TweetTokenizer(preserve_case=False)
+# Check data distribution from train/test split should be 50/50
+print(len(y_train[y_train == 0]))
+print(len(y_train[y_train == 1]))
+print(len(y_test[y_test == 0]))
+print(len(y_test[y_test == 1]))
 ```
+
+    224668
+    225332
+    25016
+    24984
+    
 
 
 ```python
@@ -245,64 +281,182 @@ for param_name in sorted(parameters.keys()):
     	tfidf__norm: None
     
 
-
 ```python
 # Dump model from grid search cv
-joblib.dump(grid.best_estimator_, 'lr_sentiment_cv.pkl', compress=1)
+joblib.dump(grid.best_estimator_, 'lr_sentiment_cv.pkl', compress=3) # compression 3 is good compromise
+```
+
+
+```python
+# Checkpoint 2: Skip ahead here to train basic model once we know optimal hyperparameters GridSearch with cross-validation
+# Some thoughts:
+# 1. Exclude analyzing tweet length since it does not enhance/degrade model performance, leading to simpler model
+# 2. Tfidf performs better than standard countvector analysis which is a bit more in-depth for analysis
+tfidf = TfidfVectorizer(tokenizer=tokenizer.tokenize, ngram_range=(1,3), max_df=0.25, norm=None)
+clf = LogisticRegression(C=0.01)
+pipeline = Pipeline([
+        ('tfidf', tfidf),
+        ('clf', clf)
+    ])
+pipeline.fit(X_train, y_train)
 ```
 
 
 
 
-    ['lr_sentiment_cv.pkl']
+    Pipeline(memory=None,
+         steps=[('tfidf', TfidfVectorizer(analyzer='word', binary=False, decode_error='strict',
+            dtype=<class 'numpy.int64'>, encoding='utf-8', input='content',
+            lowercase=True, max_df=0.25, max_features=None, min_df=1,
+            ngram_range=(1, 3), norm=None, preprocessor=None, smooth_idf=True,
+    ...ty='l2', random_state=None, solver='liblinear', tol=0.0001,
+              verbose=0, warm_start=False))])
 
 
 
 
 ```python
-# Starting point 2: Post-model load comparison
+scores = cross_val_score(pipeline, X_train, y_train, cv=10) # Cross-validate basic model from discovered hyper-params
+print(scores.mean()) # basic model tuned actually performs with higher accuracy however we should test holdout dataset
+```
+
+    0.8156866699389553
+    
+
+
+```python
+# Dump model from improved
+joblib.dump(pipeline, 'lr_sentiment_basic_improved.pkl', compress=3) # compression 3 is good compromise
+```
+
+
+
+
+    ['lr_sentiment_basic_improved.pkl']
+
+
+
+
+```python
+# Checkpoint 3: Post-model load comparison from existing models (lra advanced, lrb basic)
 lra = joblib.load('./Models/Stanford_Twitter_Models/lr_sentiment_cv.pkl') 
-lrb = joblib.load('./Models/Twitter_Simple_Models/lr_sentiment_basic.pkl') 
+lrb = joblib.load('./Models/Twitter_Simple_Models/lr_sentiment_basic.pkl')
+lrb_imp = joblib.load('./Models/Stanford_Twitter_Models/lr_sentiment_basic_improved.pkl') 
 ```
 
 
 ```python
-# Model performance indicators for basic model
-y_pred_basic = lrb.predict(X_test)
-print(confusion_matrix(y_test, y_pred_basic))
-show_roc(lrb, X_test, y_test) # AUC
+# Performance indicators for all models
+lra_preds = lra.predict(X_test)
+show_model_report("LR GridSearchCV", lra, lra_preds, X_test, y_test)
+lrb_preds = lrb.predict(X_test)
+show_model_report("LR Basic Model", lrb, lrb_preds, X_test, y_test)
+lrb_imp_preds = lrb_imp.predict(X_test)
+show_model_report("LR Improved Basic Model", lrb_imp, lrb_imp_preds, X_test, y_test)
 ```
 
-    [[7562 2347]
-     [2181 7910]]
+    [[20372  4644]
+     [ 4006 20978]]
     
 
 
-![basic_auc](https://user-images.githubusercontent.com/10522556/47269973-06dd1280-d533-11e8-8686-284702733082.png)
+![gridsearch](https://user-images.githubusercontent.com/10522556/49188767-f3934300-f339-11e8-9437-88bc38cfb157.png)
+
+
+    [[18816  6200]
+     [ 5454 19530]]
+    
+
+
+![basic](https://user-images.githubusercontent.com/10522556/49188766-f3934300-f339-11e8-9bf0-e04b0c68819d.png)
+
+
+    [[20045  4971]
+     [ 4227 20757]]
+    
+
+
+![improved](https://user-images.githubusercontent.com/10522556/49188765-f3934300-f339-11e8-8e41-2243a7e20f9f.png)
 
 
 
 ```python
-# Model performance indicators for hypertuned model
-y_pred_hyper = lra.predict(X_test)
-print(confusion_matrix(y_test, y_pred_hyper))
-show_roc(lra, X_test, y_test) # AUC
+# Display misclassified records based on predicted vs. actual with test set
+show_misclassified(lra_preds, X_test, y_test)
+show_misclassified(lrb_preds, X_test, y_test)
+show_misclassified(lrb_imp_preds, X_test, y_test)
 ```
 
-    [[7861 2048]
-     [1863 8228]]
+         actual_vals                                           features  \
+    10           1.0  just winding down had the most perfect day tod...   
+    42           1.0  oh ballarat hangs soon gonna visit mattai boi ...   
+    51           0.0       walking to the library now could be swimming   
+    65           0.0                                        know so sad   
+    151          0.0  know right how do you screw that up but pretty...   
     
+         predicted_vals  
+    10                0  
+    42                0  
+    51                1  
+    65                1  
+    151               1  
+         actual_vals                                           features  \
+    9            1.0                                           new hair   
+    10           1.0  just winding down had the most perfect day tod...   
+    42           1.0  oh ballarat hangs soon gonna visit mattai boi ...   
+    51           0.0       walking to the library now could be swimming   
+    151          0.0  know right how do you screw that up but pretty...   
+    
+         predicted_vals  
+    9                 0  
+    10                0  
+    42                0  
+    51                1  
+    151               1  
+         actual_vals                                           features  \
+    10           1.0  just winding down had the most perfect day tod...   
+    51           0.0       walking to the library now could be swimming   
+    285          1.0  being lazy outside sunbathing listening to all...   
+    346          1.0  ve already starting retweeting too we ll get t...   
+    404          1.0  wondering if you can keep up with vegas start ...   
+    
+         predicted_vals  
+    10                0  
+    51                1  
+    285               0  
+    346               0  
+    404               0  
 
 
-![cv_auc](https://user-images.githubusercontent.com/10522556/47269972-06dd1280-d533-11e8-99d6-a2b211f73185.png)
+```python
+# Holdout dataset accuracy, classification report, and display misclassified records with actual values
+test_csv = 'stanford_clean_twitter_test.csv' # different twitter dataset
+holdout_df = pd.read_csv(test_csv,index_col=0, encoding='latin-1')
+X_h_test = holdout_df.text[0:200] # First 100 holdout set
+y_h_test = holdout_df.target[0:200] # First 100 holdout set
+holdout_preds = lra.predict(X_h_test)
+```
+
+
+```python
+pipeline.score(X_h_test, y_h_test) # raw score on holdout set with improved basic model
+```
+
+
+
+
+    0.825
+
 
 
 
 ```python
-print(lrb.predict(["terrible idea why was this even made"]))
-print(lrb.predict(["that was the best movie ever"]))
+print(classification_report(y_h_test, holdout_preds)) # looks like we are better at classifying positive comments vs. negative
 ```
 
-    [0]
-    [1]
+                 precision    recall  f1-score   support
     
+              0       0.77      0.76      0.76        74
+              1       0.86      0.87      0.86       126
+    
+    avg / total       0.82      0.82      0.82       200
