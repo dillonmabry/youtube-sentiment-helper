@@ -432,7 +432,8 @@ pipeline.score(X_h_test, y_h_test) # raw score on holdout set with improved basi
 
 
 ```python
-print(classification_report(y_h_test, holdout_preds)) # looks like we are better at classifying positive comments vs. negative
+# looks like we are better at classifying positive comments vs. negative
+print(classification_report(y_h_test, holdout_preds))
 ```
 
                  precision    recall  f1-score   support
