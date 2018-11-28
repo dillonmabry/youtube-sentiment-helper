@@ -218,7 +218,6 @@ print(len(y_test[y_test == 1]))
     
 
 ```python
-# Hyperparameter tuning (Simple model)
 #cvect = CountVectorizer(tokenizer=tokenizer.tokenize)
 tfidf = TfidfVectorizer()
 clf = LogisticRegression()
