@@ -218,7 +218,7 @@ print(len(y_test[y_test == 1]))
     
 
 ```python
-#cvect = CountVectorizer(tokenizer=tokenizer.tokenize)
+# GridSearchCV hyperparam tuning
 tfidf = TfidfVectorizer()
 clf = LogisticRegression()
 
