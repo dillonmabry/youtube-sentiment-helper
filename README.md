@@ -81,14 +81,12 @@ from sklearn.externals import joblib
 from sklearn.model_selection import train_test_split, cross_val_score
 ```
 
-
 ```python
 # Dataset of 1.6m Twitter tweets
 columns = ['sentiment', 'id', 'date', 'query_string', 'user', 'text']
 train = pd.read_csv('stanford_twitter_train.csv', encoding='latin-1', header=None, names=columns)
 test = pd.read_csv('stanford_twitter_test.csv', encoding='latin-1', header=None, names=columns)
 ```
-
 
 ```python
 ## Local helpers
@@ -161,7 +159,6 @@ def show_misclassified(preds, X_test, y_test):
     print(mis_df.head())
 ```
 
-
 ```python
 # Data cleaning
 cleaned_tweets = []
@@ -175,17 +172,11 @@ cleaned_df = cleaned_df.dropna() # drop null records
 cleaned_df.to_csv('stanford_clean_twitter_train.csv',encoding='utf-8')
 ```
 
-
 ```python
 # Checkpoint 1: from import clean dataset
 csv = 'stanford_clean_twitter_train.csv'
 df = pd.read_csv(csv,index_col=0)
 ```
-
-    C:\Program Files (x86)\Microsoft Visual Studio\Shared\Anaconda3_64\lib\site-packages\numpy\lib\arraysetops.py:472: FutureWarning: elementwise comparison failed; returning scalar instead, but in the future will perform elementwise comparison
-      mask |= (ar1 == a)
-    
-
 
 ```python
 # Ensure no N/As, our dataset does have very few N/As post-cleanse, therefore omission is best course of action
@@ -194,13 +185,11 @@ df = df.dropna()
 df = df.sample(frac=1).reset_index(drop=True)
 ```
 
-
 ```python
 X, y = df.text[0:500000], df.target[0:500000] # Data subset for performance reasons, though more data helps
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=123, test_size=0.10)
 ```
-
 
 ```python
 # Dataset shapes post-split
@@ -213,7 +202,6 @@ print(np.unique(y_train))
     (50000,)
     [0 1]
     
-
 
 ```python
 # Check data distribution from train/test split should be 50/50
@@ -228,7 +216,6 @@ print(len(y_test[y_test == 1]))
     25016
     24984
     
-
 
 ```python
 # Hyperparameter tuning (Simple model)
@@ -301,9 +288,6 @@ pipeline = Pipeline([
 pipeline.fit(X_train, y_train)
 ```
 
-
-
-
     Pipeline(memory=None,
          steps=[('tfidf', TfidfVectorizer(analyzer='word', binary=False, decode_error='strict',
             dtype=<class 'numpy.int64'>, encoding='utf-8', input='content',
@@ -311,8 +295,6 @@ pipeline.fit(X_train, y_train)
             ngram_range=(1, 3), norm=None, preprocessor=None, smooth_idf=True,
     ...ty='l2', random_state=None, solver='liblinear', tol=0.0001,
               verbose=0, warm_start=False))])
-
-
 
 
 ```python
